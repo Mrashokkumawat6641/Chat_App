@@ -1,18 +1,20 @@
 import express from 'express';
-import cors from 'cors';
+// import cors from 'cors';
 import dotenv from 'dotenv';
 import db from './lib/db.js';
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
 import cookieParser from "cookie-parser";
-const app = express();
+import {cors} from './middleware/cors.middleware.js';
+
 dotenv.config();
 
-
+const app = express();  
 // Middleware
-app.use(cors())
+app.use(cors);
 app.use(express.json());
 app.use(cookieParser());
+
 // Database Connection
 db();
 

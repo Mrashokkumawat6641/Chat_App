@@ -24,14 +24,12 @@ export const useAuthStore = create((set) => ({
     signup: async (data) => {
         set({ isSigningUp: true });
         try {
-            const res = await axiosInstance.post("/auth/signup", data);
+            const res = await axiosInstance.post("/api/auth/signup", data);
             set({ authUser: res.data });
             console.log(data,"asfdasjlkfdjasklfjklsjfk")
             toast.success("Account created successfully");
         } catch (error) {
             toast.error(error.response.data.message);
-
-            
             toast.error(error.response?.data?.message || "An unexpected error occurred.");
         } finally {
             set({ isSigningUp: false });
