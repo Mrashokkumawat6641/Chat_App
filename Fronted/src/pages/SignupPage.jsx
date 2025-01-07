@@ -15,9 +15,11 @@ const SignupPage = () => {
     password: "",
   });
 
-  const { signup, isSigningUp } = useAuthStore();
+
+    const { signup, isSigningUp } = useAuthStore();
 
   const validateForm = () => {
+    
     if (!formData.fullName.trim()) return toast.error("Full name is required");
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
@@ -31,11 +33,11 @@ const SignupPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 console.log(formData)
-    // const success = validateForm()
 
-    // if (success === true) signup(formData)
+    const success = validateForm()
+
+    if (success === true) signup(formData)
     // console.error("Signup failed:", error);
-
   }
 
   // const handleSubmit = async (e) => {
