@@ -9,9 +9,10 @@ export const useAuthStore = create((set) => ({
     isUpdatingProfile: false,
     isCheckingAuth: true,
 
+    
     checkAuth: async () => {
         try {
-            const res = await axiosInstance.get("auth/check");
+            const res = await axiosInstance.get("/auth/check");
             set({ authUser: res.data });
         } catch (error) {
             console.log("Error in checkAuth", error)
@@ -35,5 +36,6 @@ export const useAuthStore = create((set) => ({
             set({ isSigningUp: false });
         }
     },
-}));
+}));        
+
 

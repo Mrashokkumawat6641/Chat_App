@@ -22,4 +22,7 @@ db();
 app.use('/api/auth', authRoutes);
 app.use('/api/message', messageRoutes);
 
+
+
+
 export default app;

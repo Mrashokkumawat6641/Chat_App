@@ -3,6 +3,9 @@ import bcrypt from "bcrypt";
 import { generateToken } from '../utils/logger.js';
 import cloudinary from '../lib/cloudinary.js';
 
+
+
+
 //get all data
 
 export const users = async (req, res) => {
