@@ -10,14 +10,11 @@ import cloudinary from '../lib/cloudinary.js';
 
 export const users = async (req, res) => {
     try {
-        // Retrieve all users from the "users" collection
         const users = await mongoose.connection.db.collection('users').find({}).toArray();
-
         if (users.length === 0) {
             return res.status(404).json({ message: 'No users found' });
         }
-
-        res.status(200).json(users); // Send all user data
+        res.status(200).json(users); 
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -86,6 +83,7 @@ export const signup = async (req, res) => {
 
     }
 };
+
 
 //Login User Api
 

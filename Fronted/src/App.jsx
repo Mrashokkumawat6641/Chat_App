@@ -10,7 +10,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { useAuthStore } from './store/UseAuthStore'
 import { useEffect } from 'react';
 
-import { Loader } from "lucide-react"
+// import { Loader } from "lucide-react"
 import { Toaster } from 'react-hot-toast'
 import SignupPage from './pages/SignupPage'
 
@@ -22,14 +22,13 @@ const App = () => {
 
   console.log( authUser )
 
-  if (isCheckingAuth && !authUser) 
-    return (
-    <div className='flex items-center justify-center h-screen'>
-      <Loader className="size-10 animate-spin" />
-    </div>
-  );
+  // if (isCheckingAuth && !authUser) 
+  //   return (
+  //   <div className='flex items-center justify-center h-screen'>
+  //     {/* <Loader className="size-10 animate-spin" /> */}
+  //   </div>
+  // );
 
-  console.log({ authUser })
   return (
     <div>
       <Navbar />
