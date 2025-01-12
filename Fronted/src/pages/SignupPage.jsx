@@ -1,5 +1,8 @@
-import { Eye, EyeOff, Link, Loader2, Lock, Mail, MessageSquare, User } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import React, { useState } from 'react'
+import validator from 'validator';
+
 import { useAuthStore } from '../store/UseAuthStore';
 
 import AuthImagePattern from '../components/AuthImagePattern';
@@ -13,28 +16,69 @@ const SignupPage = () => {
     password: "",
   });
 
+
   const { signup, isSigningUp } = useAuthStore();
 
   const validateForm = () => {
-    if (!formData.fullName.trim()) return toast.error("Full name is required");
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      return toast.error("Invalid email format");
+    if (!formData.fullName.trim()) {
+      toast.error("Full name is required", {
+        duration: 1000,
+      });
+      return false;
     }
-    if (!formData.password) return toast.error("Password is required");
-    if (formData.password.length < 6) return toast.error("Password must be at least 6 characters");
+    if (!formData.email) {
+      toast.error("Please provide an email", {
+        duration: 1000,
+      });
+      return false;
+    }
+
+    const email = formData.email.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // console.log("Email being validated:", email); 
+
+
+    if (!validator.isEmail(formData.email)) {
+      toast.error("Invalid email format", {
+        duration: 1000,
+      });
+
+      return false;
+    }
+    if (!email) {
+      toast.error("Email is required", {
+        duration: 1000,
+      });
+      return false;
+    }
+    if (!emailRegex.test(email)) {
+      toast.error("Invalid email format");
+      return false;
+    }
+
+    if (!formData.password) {
+      toast.error("Password is required");
+      return false;
+    }
+    if (formData.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return false;
+    }
     return true;
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    console.log(formData, 'formData');
-    if (formData) {
+    try {
       await useAuthStore.getState().signup(formData);
+      toast.success("Signup successful!");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
-  }
+  };
+
 
   return (
     <div className='min-h-screen grid lg:grid-cols-2'>

@@ -2,6 +2,7 @@ import User from '../models/user.model.js';
 import bcrypt from "bcrypt";
 import { generateToken } from '../utils/logger.js';
 import cloudinary from '../lib/cloudinary.js';
+import mongoose from 'mongoose';
 
 
 
@@ -14,7 +15,7 @@ export const users = async (req, res) => {
         if (users.length === 0) {
             return res.status(404).json({ message: 'No users found' });
         }
-        res.status(200).json(users); 
+        res.status(200).json(users);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -43,7 +44,7 @@ export const signup = async (req, res) => {
 
         if (!fullName || !email || !password) {
             return res.status(400).json({ message: 'Please provide all required fields' });
-        }        
+        }
         if (password.lenght < 6) {
             return res.status(400).json({ message: 'Password must be at least 6 characters long' });
         }
@@ -79,7 +80,7 @@ export const signup = async (req, res) => {
     } catch (error) {
         console.log("error in signup controller", error.message);
         res.status(500).json({ message: "Internal Server Error" });
-    console.log("catch method askdfalsdfjalksdfjalksd");
+        console.log("catch method askdfalsdfjalksdfjalksd");
 
     }
 };
@@ -98,7 +99,7 @@ export const login = async (req, res) => {
         }
         const isPasswordCorrect = await bcrypt.compare(password, user.password)
         if (!isPasswordCorrect) {
-            return res.status(400).json({ message: "Incorrect password" });
+            return res.status(401).json({ message: "Incorrect password" });
         }
         generateToken(user._id, res)
 
@@ -107,10 +108,11 @@ export const login = async (req, res) => {
             fullName: user.fullName,
             email: user.email,
             profilePic: user.profilePic,
+            message: "Login sucessfully"
         })
 
     } catch (error) {
-        console.log("error in login controller", error.message);
+        console.error("error in login controller :", error.message);
         res.status(500).json({ message: "Internal Server Error" })
     }
 };
@@ -122,7 +124,7 @@ export const logout = (req, res) => {
         res.cookie("jwt", "", { maxAge: 0 })
         res.status(200).json({ message: "Logged out successfully" });
     } catch (error) {
-        console.log("Error in Logout controller", error.message);   
+        console.log("Error in Logout controller", error.message);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
@@ -153,7 +155,7 @@ export const checkAuth = (req, res) => {
         res.status(200).json(req.user);
         res.send("Hello World");
     }
-    catch(error) {
+    catch (error) {
         console.log("Error in checkAuth controller", error.message);
         res.status(500).json({ message: "Internal Server Error" });
     }
