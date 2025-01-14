@@ -3,12 +3,7 @@ import bcrypt from "bcrypt";
 import { generateToken } from '../utils/logger.js';
 import cloudinary from '../lib/cloudinary.js';
 import mongoose from 'mongoose';
-
-
-
-
 //get all data
-
 export const users = async (req, res) => {
     try {
         const users = await mongoose.connection.db.collection('users').find({}).toArray();
@@ -41,90 +36,128 @@ export const loginn = async (req, res) => {
 export const signup = async (req, res) => {
     const { fullName, email, password } = req.body;
     try {
-
         if (!fullName || !email || !password) {
             return res.status(400).json({ message: 'Please provide all required fields' });
         }
-        if (password.lenght < 6) {
+
+        if (password.length < 6) {
             return res.status(400).json({ message: 'Password must be at least 6 characters long' });
         }
-        const user = await User.findOne({ email })
 
+        const user = await User.findOne({ email }, { _id: 1 });
         if (user) return res.status(400).json({ message: 'User already exists' });
 
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = new User({
             fullName,
             email,
-            password: hashedPassword,
-        })
+            password: hashedPassword,   
+        });
 
-        if (newUser) {
-            generateToken(newUser._id, res)
-            await newUser.save();
+        // Save the user first
+        await newUser.save();
 
-            res.status(201).json({
-                _id: newUser._id,
-                fullName: newUser.fullName,
-                email: newUser.email,
-                profilePic: newUser.profilePic,
-            });
-        } else {
-            res.status(400).json({ message: "Invaild user data" })
-        }
+        // Generate and set the token
+        generateToken(newUser._id, res);
 
-
-
+        res.status(201).json({
+            _id: newUser._id,
+            fullName: newUser.fullName,
+            email: newUser.email,
+            profilePic: newUser.profilePic || "default-profile-pic-url",
+        });
     } catch (error) {
-        console.log("error in signup controller", error.message);
+        console.error("Error in signup controller:", error.message);
         res.status(500).json({ message: "Internal Server Error" });
-        console.log("catch method askdfalsdfjalksdfjalksd");
-
     }
 };
 
+// export const signup = async (req, res) => {
+//     const { fullName, email, password } = req.body
+//     try {
+//         if (!fullName || !email || !password) {
+//             return res.status(400).json({ message: 'Please provide all required fields' })
+//         }
 
-//Login User Api
+//         if (password.length < 6) {
+//             return res.status(400).json({ message: 'Password must be at least 6 characters long' })
+//         }
+
+//         const user = await User.findOne({ email }, { _id: 1 })
+//         if (user) return res.status(400).json({ message: 'User already exists' });
+
+//         // Directly store the plain password (not recommended for production)
+//         const newUser = new User({
+//             fullName,
+//             email,
+//             password, // Plain password stored (temporary change)
+//         });
+
+//         // Save the user first
+//         await newUser.save();
+
+//         // Generate and set the token
+//         generateToken(newUser._id, res);
+
+//         res.status(201).json({
+//             _id: newUser._id,
+//             fullName: newUser.fullName,
+//             email: newUser.email,
+//             profilePic: newUser.profilePic || "default-profile-pic-url",
+//         });
+//     } catch (error) {
+//         console.error("Error in signup controller:", error.message)
+//         res.status(500).json({ message: "Internal Server Error" })
+//     }
+// }
+// import bcrypt from "bcryptjs";
+// import User from "../models/User.js"; // Replace with your actual User model path
 
 export const login = async (req, res) => {
-    const { email, password } = req.body
-    // console.log("hwwllllsdfkjs", email, password)
+    const { email, password } = req.body;
     try {
-        const user = await User.findOne({ email })
+        console.log('Login request received:', { email, password });
 
+        const user = await User.findOne({ email }).select('+password');
         if (!user) {
-            return res.status(400).json({ message: "User not found" })
+            console.log('User not found for email:', email);
+            return res.status(400).json({ message: 'User not found' });
         }
-        const isPasswordCorrect = await bcrypt.compare(password, user.password)
-        if (!isPasswordCorrect) {
-            return res.status(401).json({ message: "Incorrect password" });
-        }
-        generateToken(user._id, res)
 
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if (!isPasswordCorrect) {
+            console.log('Password incorrect for email:', email);
+            return res.status(401).json({ message: 'Incorrect password' });
+        }
+
+        console.log('Password verified, login successful...');
         res.status(200).json({
+            message: 'Login successful',
             _id: user._id,
             fullName: user.fullName,
             email: user.email,
             profilePic: user.profilePic,
-            message: "Login sucessfully"
-        })
-
+        });
     } catch (error) {
-        console.error("error in login controller :", error.message);
-        res.status(500).json({ message: "Internal Server Error" })
+        console.error('Error during login:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
 };
 
+
+
 // logout user
+
+
 
 export const logout = (req, res) => {
     try {
         res.cookie("jwt", "", { maxAge: 0 })
         res.status(200).json({ message: "Logged out successfully" });
     } catch (error) {
-        console.log("Error in Logout controller", error.message);
+        // console.log("Error in Logout controller", error.message);
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
@@ -151,7 +184,7 @@ export const updateProfile = async (req, res) => {
 };
 
 export const checkAuth = (req, res) => {
-    try {
+try {
         res.status(200).json(req.user);
         res.send("Hello World");
     }

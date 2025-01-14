@@ -73,7 +73,7 @@ const SignupPage = () => {
 
     try {
       await useAuthStore.getState().signup(formData);
-      toast.success("Signup successful!");
+      // toast.success("Signup successful!");
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong");
     }

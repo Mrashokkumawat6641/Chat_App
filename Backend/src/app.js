@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import db from './lib/db.js';
 import authRoutes from './routes/auth.route.js';
 import messageRoutes from './routes/message.route.js';
+
 import cookieParser from "cookie-parser";
 // import {corsMiddleware} from './middleware/cors.middleware.js';
 
@@ -20,7 +21,7 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true, 
 }));
-
+    
 app.options('*', cors());
 
 app.use(express.json() );

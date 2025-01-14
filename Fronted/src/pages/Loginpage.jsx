@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import React, { useState } from "react";
 import toast from 'react-hot-toast';
 import { useAuthStore } from "../store/UseAuthStore";
+
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -11,26 +12,38 @@ const LoginPage = () => {
   });
 
   const { login, isLoggingIn } = useAuthStore();
+
   const validateForm = () => {
-    if (!formData.email == true) {
-      return toast.error("Pleae provide an email")
+    if (!formData.email) {
+      toast.error("Please provide an email");
+      return false;
     }
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      return toast.error("Invalid email format");
+      toast.error("Invalid email format");
+      return false;
     }
-    if (!formData.password) return toast.error("Password is required");
-  }
+    if (!formData.password) {
+      toast.error("Password is required");
+      return false;
+    }
+    return true;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+
+
+    try {
+      await login(formData); 
+    } catch (error) {
+      console.error("Error during login: ", error);
+    }
   };
 
   return (
     <div className="h-screen grid lg:grid-cols-2">
-
-
       {/* {Left side - Form} */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
@@ -99,7 +112,7 @@ const LoginPage = () => {
                   Loading...
                 </>
               ) : (
-                "Sign in"
+                "Login"
               )}
             </button>
           </form>
@@ -116,8 +129,4 @@ const LoginPage = () => {
     </div>
   );
 };
-
-function App() {
-  return <h1>{"hello" + true}</h1>
-}
 export default LoginPage;
